@@ -3,7 +3,7 @@ local mod = CurseOfMortality
 local warningText = {
 	"--------------------------------------------------",
 	mod.Name .. " could not initialize properly!",
-	"Make sure both MinimapAPI and Better CurseAPI are enabled!",
+	"Make sure REPENTOGON, MinimapAPI and Better CurseAPI are enabled!",
 	"--------------------------------------------------",
 }
 

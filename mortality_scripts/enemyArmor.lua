@@ -19,7 +19,7 @@ local barStates = {
 -- Give NPCs damage reduction
 function mod:NPCInit(entity)
 	if mod:ShouldApplyCurseEffects()
-	and entity:IsActiveEnemy(false) and entity.CanShutDoors -- Is an active enemy
+	and entity:IsActiveEnemy(false) and entity.MaxHitPoints > 0 and entity.CanShutDoors -- Is an active enemy
 	and not entity:HasEntityFlags(EntityFlag.FLAG_FRIENDLY) then -- Not friendly
 		local room = Game():GetRoom()
 
@@ -122,6 +122,7 @@ function mod:NPCRender(entity, offset)
 
 		-- Render the bar
 		if data.CurseOfMortalityArmor
+		and entity:IsVulnerableEnemy() -- Is vulnerable
 		and entity.Visible and entity.Color.A > 0 and entity:GetSprite().Color.A > 0 -- The entity is visible
 		and not renderingReflections then -- Don't render reflections for the icon
 			local yOffset = entity.Size * entity.SizeMulti.Y * entity.Scale * Settings.BarScale
@@ -134,23 +135,15 @@ mod:AddCallback(ModCallbacks.MC_POST_NPC_RENDER, mod.NPCRender)
 
 
 
--- Handle taking damage
+-- Apply the new damage amount
 function mod:NPCDMG(entity, damageAmount, damageFlags, damageSource, damageCountdownFrames)
 	local data = entity:GetData()
 
-	if mod:ShouldApplyCurseEffects() and data.CurseOfMortalityArmor
-	and not (damageFlags & DamageFlag.DAMAGE_CLONES > 0) then
-		damageFlags = damageFlags + DamageFlag.DAMAGE_CLONES
-		entity:GetData().redamaging = true -- Retribution bullshit fix...
-
-		-- Apply the new damage amount
+	if mod:ShouldApplyCurseEffects() and data.CurseOfMortalityArmor then
 		local armor = data.CurseOfMortalityArmor
 		local damageReduction = armor.Minimum + (100 - armor.Minimum) / 100 * armor.Amount
 		local damageMulti = (100 - damageReduction) / 100
-		entity:TakeDamage(damageAmount * damageMulti, damageFlags, damageSource, 1)
-
-		entity:GetData().redamaging = false
-		return false
+		return { Damage = damageAmount * damageMulti, }
 	end
 end
 mod:AddPriorityCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, CallbackPriority.IMPORTANT, mod.NPCDMG)

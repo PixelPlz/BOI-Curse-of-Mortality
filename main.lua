@@ -3,7 +3,7 @@ local scriptsFolder = "mortality_scripts."
 
 
 -- Load scripts
-if MinimapAPI and BetterCurseAPI then
+if REPENTOGON and MinimapAPI and BetterCurseAPI then
 	local scripts = {
 		"saveData",
 		"curseHandler",

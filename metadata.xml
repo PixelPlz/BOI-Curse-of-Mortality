@@ -4,8 +4,8 @@
     <directory>curse of mortality</directory>
     <id>3364861554</id>
     <description></description>
-    <version>1.1</version>
-    <visibility>Private</visibility>
+    <version>1.2</version>
+    <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Rooms"/>
     <tag id="Floors"/>

@@ -10,7 +10,6 @@ local Settings = {
 
 -- Make sure self-damage items don't increase the damage count
 local damageFlagBlacklist = {
-	DamageFlag.DAMAGE_CLONES, -- Avoid infinite loops
 	DamageFlag.DAMAGE_RED_HEARTS,
 	DamageFlag.DAMAGE_INVINCIBLE,
 	DamageFlag.DAMAGE_IV_BAG,
@@ -50,18 +49,15 @@ function mod:PlayerDMG(entity, damageAmount, damageFlags, damageSource, damageCo
 			damageIncrease = math.max(0, damageIncrease - Settings.KeeperSafeguard)
 		end
 
-		-- Apply the new damage amount
-		damageFlags = damageFlags + DamageFlag.DAMAGE_CLONES
-		entity:TakeDamage(damageAmount + damageIncrease, damageFlags, damageSource, 1)
-
 		-- Sound
-		local volume = math.min(0.8, damageCounter * 0.2)
 		local pitch = math.random(90, 110) / 100
-		SFXManager():Play(SoundEffect.SOUND_STATIC, volume, 0, false, pitch)
+		SFXManager():Play(SoundEffect.SOUND_STATIC, 0.5, 0, false, pitch)
 
 		-- Increase future damage taken
 		mod.SavedData.DamageTracker[playerIdx] = mod.SavedData.DamageTracker[playerIdx] + 1
-		return false
+
+		-- Apply the new damage amount
+		return { Damage = damageAmount + damageIncrease, }
 	end
 end
 mod:AddPriorityCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, CallbackPriority.IMPORTANT, mod.PlayerDMG, EntityType.ENTITY_PLAYER)
@@ -118,9 +114,8 @@ function mod:PlayerHandlekMantle(player)
 		-- Break sound
 		if data.MantleBreakSound then
 			if data.MantleBreakSound <= 0 then
-				local volume = (1 / Settings.MaxMantleUses) * mod.SavedData.LostTracker[playerIdx]
 				local pitch = math.random(90, 110) / 100
-				SFXManager():Play(SoundEffect.SOUND_STATIC, volume, 0, false, pitch)
+				SFXManager():Play(SoundEffect.SOUND_STATIC, 0.5, 0, false, pitch)
 
 				data.MantleBreakSound = nil
 			else
